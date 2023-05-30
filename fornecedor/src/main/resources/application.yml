@@ -1,0 +1,30 @@
+server:
+  port: 8081 
+
+# SALVO NO SPRING CONFIG SERVER, que busca no GIT
+#  main:
+#    # sem essa definição a aplicação dará erros ao instanciar os repositories
+#    allow-bean-definition-overriding: true
+#  data:
+#    jpa.repositories.enabled: true
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/fornecedor
+#    username: root
+#    password: 12345
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#  jpa:
+#    open-in-view: false
+#    hibernate:
+#      ddl-auto: update
+      
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+security:
+  oauth2:
+    resource:
+      user-info-uri: http://localhost:8088/user

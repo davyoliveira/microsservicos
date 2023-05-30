@@ -1,0 +1,194 @@
+Microserviços
+
+- indicação de começar projetos em aplicação monolítica e dps mudar pra microserviços o que for necessário
+
+- Algumas vantagens:
+	Projetos independentes = tecnologias independentes
+	Falha em 1 serviço é isolada
+	Deploys menores e mais rápidos
+
+- Algumas desvantagens:
+	Maior complexidade de desenvolvimento e infra
+	Debug mais complexo
+	Comunicação entre os serviços deve ser bem pensada
+	Diversas tecnologias pode ser um problema
+	Monitoramento é crucial e mais complexo
+
+- tipos de microsserviços:
+	data service, é um tipo de um serviço que simplesmente vai expor dados, como se fosse uma fina camada antes do seu banco de dados. Então o que ele vai fazer é receber dados e realizar o processamento necessário para manter aqueles dados consistentes.
+	business service, é um tipo de serviço que além de consumir dados de alguma forma, seja consumindo um data service ou tendo acesso direto ao banco de dados, ele fornece operações mais complexas.
+	translation services, são basicamente uma forma de você acessar algum recurso externo, mas mantendo certo controle. Então imagine que, por exemplo, eu queira consumir um serviço de log externo.
+	edge service, como o nome já diz, serviço de ponta, é algo que é entregue diretamente para o cliente e pode ter necessidades específicas.
+
+- strangler pattern:
+	a ideia por trás desse strangler pattern é ir quebrando ele, tirando pequenas funcionalidades
+	Podemos começar esse processo isolando os dados de um monolito ou podemos começar esse processo isolando o domínio de um monolito.
+
+- sidecar pattern:
+	Vamos determinar um processo comum, por exemplo, realizar log. Isso é comum a todos os serviços, só que isso também vai crescer conforme o serviço cresce, então vamos precisar ter essa escalabilidade junto com o serviço. Se tivéssemos um serviço separado teríamos outros problemas.
+	Vamos construir um módulo compartilhável. (maven no java)
+
+- api gateway
+Aprendemos sobre ter um ponto único de entrada na aplicação com API Gateway
+	problema, clientes acessando livremente os serviços geram caos
+	gateway fornece um proxy, uma fachada, para as necessidades reais
+	desvantagem, esse portao de entrada pode se tornar um poto central de falha
+
+	- comportamentos
+		autorizar e redirecionar os requests
+		uso de decorator para adicionar informacoes necessarias aos requests
+		limitar o acesso ou conteudo trafegado
+
+- agregando processos
+Vimos como agregar processos distintos em uma operação
+	- process agragator pattern
+		serviços de negocio agregam servicos de dominio
+		process aggregators agregam servicos de negocio
+		agregadores fazem as chamadas para  os servicos necessarios e montam a resposta correta
+		pode e deve ter logica de processamento
+	- construindo um agregador
+		defina um novo modelo para representar os dados agragados
+		a partir deste modelo, pense na api que fornecera as operaçoes
+
+- edge pattern
+Conhecemos a ideia de ter um Gateway por cliente com o Edge Pattern
+	gateway especifico para determinado cliente
+	foco nas necessidade reais de determinados clientes
+
+	- construinbo uma ponta
+		identifique o cliente e suas necessaidades
+		construa contratos especificos para o cliente
+		modifique os dados que sao transferidos para garantir a otimizacao do processo
+		existe a possibilidade de ter apenas edges, e nao gateway
+
+- single service database
+	problema escAbilidade do servico e do banco sao fortemente relacionados
+	solucao cada servico tera seu proprio bd
+
+- shared service database
+	problema as vezes precisamos centralizar os dados
+	solucao trate esse banco em cada servico como se ele fosse separado
+
+- padrao de codificacao
+	CQRS (commado query responsability segregation)
+	No seu coração, no seu núcleo é a noção de que podemos utilizar modelos diferentes para buscar uma informação e para atualizar ou inserir uma informação
+	leitura e escrita separados, cada parte pode realizar operacoes mais complexas
+	modelo de leitura pode ter informacoes agragadas de outros dominios
+	escrita pode ter dados sendo automaticamente gerados
+	aumenta muito a complexidade do sistema
+	https://www.youtube.com/watch?v=yd6V4w19iJU&ab_channel=EximiaCo
+
+- asynchronous eventing
+	determinados problemas nao podem ser resolvidos na hora
+	um serviço emite um evento que será tratado em seu devido tempo
+	tecnologias como mensagerias e servicos de stream de dados brilham
+
+- agregando logs
+	formatos de log devem ser compartilhados entre os serviços
+	uma taxonomia comum deve ser compartilhada
+	logs de monoliticos sao agregados por padrao. com microsservicos o buraco é mais embaixo
+	parte da tarefa de agregacao pode ser o parsing dos logs para categorizar corretamente
+
+- rastreandos chamadas
+	uma parte importante de realizar logs é rastrear as chmadas de uma execucao
+	devemos poder reconstruir uma operacap a partir de um identificador
+	isso é o equivalente a call stack de um sistema monolitico
+	use padroes de trace id para gerar os logs
+	use ferramentas de gerenciamento (APMs) para visualizar 
+
+- agregando métricas
+	enquanto logs precisam de desevolvimento, metricas so precisam de instrumentacao
+	metricas nos permitem saber o que esta acontecendo  em determinado momento
+	construa ou use dashboards de alto nivel para ter uma facil visao do status atual da aplicacao
+	depois, tenha dashboards especificos para cada servico, com mais detalhes
+	
+
+- 	Qual a solução a ser implementada no curso
+	Teremos três microsserviços: Fornecedor, Loja e Transportador
+	Uma apresentação da modelagem focado em DDD (Domain Driven Design)
+	Quebraremos o domínio em contextos menores (bounded context)
+	Um microsserviço é a implementação de um contexto
+	O uso do Postman como cliente HTTP
+	A criação do microsserviço Loja usando Spring Boot
+
+-	A integração entre microsserviços com RestTemplate
+	O RestTemplate do Spring permite chamadas HTTP de alto nível
+	Um introdução ao Service discovery e Service registry
+	Service registry é um servidor central, onde todos os microsserviços ficam cadastrados (nome e IP/porta)
+	Service discovery é um mecanismo de descoberta do IP do microsserviço pelo nome
+	Dessa forma, nenhum microsserviço fica acoplado ao outro pelo IP/porta
+	A implementação do service registry através do Eureka Server
+	Como registrar da Loja e do Fornecedor no Eureka Server
+	A resolução do IP/porta através do nome do microsserviço nas requisições
+
+
+-	Que um servidor de configuração é o lugar central para definir as configurações dos serviços
+	Que todas as configurações dos microsserviços devem ficar externalizadas e centralizadas
+	Que o Spring Config Server é uma implementação do servidor do projeto Spring Cloud
+	Sobre a integração dos microsserviços com o servidor de configuração
+	Para tal, devemos configurar o nome do microsserviço, profile e URL do Config Server
+	Que existem várias formas de definir um repositório de configurações, entre elas o GitHub
+
+-	Que o Client Side Load Balancing (CSLB) é o cliente HTTP que decide qual microsserviço recebe a requisição
+		Isto é importante, pois pode ter várias instâncias do mesmo serviço no ar
+		A configuração do CSLB é feita a partir da anotação @LoadBalanced, na criação do RestTemplate
+		Como implementação do CSLB, usamos um projeto chamado Ribbon, que faz parte do Spring Cloud Netflix
+	Para descobrir quais clientes existem, podemos injetar a interface DiscoveryClient
+	Como alternativa ao RestTemplate, podemos usar o Spring Feign, que já usa o Ribbon para CSLB
+
+	O Spring Feign exige apenas uma interface, com a definição e mapeamento dos métodos que executarão a requisição
+		Toda a implementação da interface é gerada pelo Spring Feign
+
+-	Como se trata de uma arquitetura distribuída, temos logs distribuídos
+		Ou seja, cada microsserviço (e instância dele) possui o seu log
+		Isso dificulta o acompanhamento e rastreabilidade das requisições
+	
+	Para unificar os logs, precisamos de agregadores de log
+		Como implementação de um agregador, usamos o Papertrail, um agregador como serviço
+	
+	Usamos a biblioteca Logback para gerar e enviar os logs ao agregador
+		O Logback possui um appender, que possibilita o envio dos logs
+	
+	Para acompanhar uma transação nos logs, usamos uma correlation-id
+		A correltation-id é um identificador da transação, que é passada de requisição pra requisição
+	
+	Dessa forma, podemos entender quais requisições fazem parte da mesma transação
+	
+	A biblioteca Spring Sleuth, que é usada para gerar a correlation-id
+
+
+-	O impacto na aplicação por problemas de lentidão ao consultar outros microsserviço
+	Como funciona o Circuit Breaker
+	Os problemas gerados na integração da Loja com o Fornecedor
+	A implementação do Circuit Breaker com Hystrix, limitando o tempo de processamento para 1 segundo
+	Como funciona o Fallback Method
+	O uso do Fallback para tratar a interrupção da Thread efetuada pelo Circuit Breaker
+
+
+-	Que o Hystrix executa uma gerência de um pool de threads
+	A combinação de um volume alto de requisições para um único serviço de um microsserviço pode indisponibilizar as outras requisições
+	Como funciona o Bulkhead Pattern
+	Como implementar o Bulkhead Pattern com o Hystrix
+	Como dividir as threads entre os serviços buscaCompa e realizaCompra
+	A análise das threads gerenciadas pelo Hystrix.
+
+-	A importação e integração com o microsserviço Transportador
+	Como realizar a compra com os dados do pedido e do voucher do transporte, utilizando os id's fornecidos pelos microsserviços
+	O entendimento de que, com microsserviços, uma transação do usuário passa por diversos microsserviços e que a gestão dessa transação fica sob a responsabilidade do programador
+	Como tratar os erros na transação, marcando o que foi processado com o uso de estados
+
+
+-	Como disponibilizar a nossa aplicação para serem acessadas por um cliente
+	O uso do Api Gateway, para criar um único ponto de acesso à nossa aplicação
+	O uso da implementação Zuul como Api Gateway do nosso sistema
+	A integração do Zuul com o Eureka, para o descobrimento automático das instâncias disponíveis da nossa aplicação
+	A alteração das requisições para os nossos microsserviços, com o uso do Zuul
+
+-	Como funciona a autenticação e autorização com microsserviços
+	Como criar um servidor de autenticação com Spring Security e Spring Cloud OAuth2
+	A implementação da integração entre o Spring Security e o Spring Cloud OAuth2
+	Como gerar e validar tokens no servidor de autenticação
+	A integração dos microsserviços com o servidor de autenticação
+	Como repassar o token de autenticação através do Zuul
+	A implementar um filtro do Feign para repassar o token do usuário nas chamadas para os microsserviços Fornecedor e Transportador
+

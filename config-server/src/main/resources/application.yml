@@ -1,0 +1,20 @@
+server:
+  port: 8888
+  
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          # configuracao para usar a branch main
+          default-label: main
+          
+          # url do repositório no git
+          uri: https://github.com/davyoliveira/microservice-config-server-repository
+          
+          # pastas dentro do repositório
+          search-paths: fornecedor, loja, transportador
+          
+          
+          
+          

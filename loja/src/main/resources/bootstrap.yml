@@ -1,0 +1,12 @@
+# esse yml é executado antes do application.yml, dessa forma, o que estiver aqui é carregado antes.
+
+spring:
+  application:
+    name: 'loja'
+    
+  profiles:
+    active: default
+    
+  cloud:
+    config:
+      uri : http://localhost:8888
